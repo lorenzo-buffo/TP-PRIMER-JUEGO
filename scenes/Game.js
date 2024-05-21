@@ -46,15 +46,27 @@ export default class Game extends Phaser.Scene {
      //genero grupo de los recolectables
     this.recolectables = this.physics.add.group(); 
     this.physics.add.collider(this.personaje, this.recolectables)
-    this.physics.add.collider(this.recolectables, this.recolectables)
+    this.physics.add.collider(this.personaje, this.recolectables, this.pj, null, this)
+    this.physics.add.overlap(this.platform, this.recolectables, this.floor, null, this)
+
+    
+
     //hago que caigan aleatoriamente cada 1 segundo
     this.time.addEvent({
       delay: 1000,
-    callback: this.onSecond,
+     callback: this.onSecond,
     callbackScope: this,
     loop: true,
   });
   }
+  pj(personaje, recolectables){
+    recolectables.destroy();
+  }
+
+  floor(plataformas, recolectables){
+    recolectables.disableBody(true,true)
+  }
+
   onSecond() {
     //crear reecolectable
 
@@ -67,6 +79,7 @@ export default class Game extends Phaser.Scene {
       tipo
     );
     recolectable.setVelocity(0, 100);
+    this.physics.add.collider(recolectable, this.recolectables)
   }
 
 
