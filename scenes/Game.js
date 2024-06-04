@@ -194,6 +194,6 @@ floor(platforms, recolectables){
   }
 
 
-  
+  // HOLA COMO VA
 }
   
