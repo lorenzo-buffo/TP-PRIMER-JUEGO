@@ -20,19 +20,19 @@ export default class Game extends Phaser.Scene {
   //cargar assets
 
   //import Cielo
-    this.load.image("Cielo", "../public/Cielo.webp");
+    this.load.image("Cielo", "./public/Cielo.webp");
 
     //import plataforma
-    this.load.image("platform", "../public/platform.png");
+    this.load.image("platform", "./public/platform.png");
 
     //import pj
-    this.load.image("personaje", "../public/Ninja.png")
+    this.load.image("personaje", "./public/Ninja.png")
 
     //import recolectable
-    this.load.image("triangle", "../public/triangle.png")
-    this.load.image("square", "../public/square.png")
-    this.load.image("diamond", "../public/diamond.png")
-    this.load.image("bomb", "../public/bomb.webp")
+    this.load.image("triangle", "./public/triangle.png")
+    this.load.image("square", "./public/square.png")
+    this.load.image("diamond", "./public/diamond.png")
+    this.load.image("bomb", "./public/bomb.webp")
 
     
 }
