@@ -1,45 +1,43 @@
+// URL to explain PHASER scene: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scene/
+export default class Game extends Phaser.Scene {
+  constructor() {
+    super("main");
+  }
 
-  export default class Game extends Phaser.Scene {
-    constructor() {
-      super("main");
-    }
-  
-    init() {
-      this.gameOver = false;
-      this.timer = 20;
-      this.score = 0;
-      this.shapes = {
-        "triangle": {point: 10, count: 0},
-        "square": {point: 20, count: 0},
-        "diamond": {point: 30, count:0},
-        "bomb": {  point: -10, count:0},
-      };
-      
-  }
-     
+  init() {
+    this.gameOver = false;
+    this.timer = 20;
+    this.score = 0;
+    this.shapes = {
+      "triangle": {points: 10, count: 0},
+      "square": {points: 20, count: 0},
+      "diamond": {points: 30, count:0},
+      "bomb": {  points: -10, count:0},
+    };
     
+}
+  preload() {
+  //cargar assets
+
+  //import Cielo
+    this.load.image("Cielo", "../public/assets/Cielo.webp");
+
+    //import plataforma
+    this.load.image("platform", "../public/assets/platform.png");
+
+    //import pj
+    this.load.image("personaje", "../public/assets/Ninja.png")
+
+    //import recolectable
+    this.load.image("triangle", "../public/assets/triangle.png")
+    this.load.image("square", "../public/assets/square.png")
+    this.load.image("diamond", "../public/assets/diamond.png")
+    this.load.image("bomb", "../public/assets/bomb.webp")
+
+    
+}
+create() {
   
-    preload() {
-    //cargar assets
-  
-    //import Cielo
-      this.load.image("Cielo", "../public/assets/Cielo.webp");
-  
-      //import plataforma
-      this.load.image("platform", "../public/assets/platform.png");
-  
-      //import pj
-      this.load.image("personaje", "../public/assets/Ninja.png")
-  
-      //import recolectable
-      this.load.image("triangle", "../public/assets/triangle.png")
-      this.load.image("square", "../public/assets/square.png")
-      this.load.image("diamond", "../public/assets/diamond.png")
-      this.load.image("bomb", "../public/assets/bomb.png")
-  
-      
-  }
-  create() {
     //Crear elemnto
   
     this.Cielo = this.add.image(400, 300, "Cielo");
@@ -51,7 +49,7 @@
     //al grupo de plataformas agregar plataforma
     this.platforms.create(400, 565, "platform").setScale(2).refreshBody();
   
-    this.platforms.create(200, 400, "platform")
+    this.platforms.create(400, 400, "platform")
   
     //Crear pj
     this.personaje = this.physics.add.sprite(400, 300, "personaje")
@@ -97,7 +95,6 @@
   
     });
   
-  
     //timer de 1 seg
     this.time.addEvent({ 
       delay: 1000,
@@ -127,31 +124,21 @@
   }
 
   pj(personaje, recolectables){
-    const nombreFig = recolectables.getData("tipo");
-    const puntosFig = recolectables.getData("points");
-
-    this.score += puntosFig;
-
-    this.shapes [nombreFig].count += 1;
-    
-   // const points= recolectables.getData("points")
-    
+    const nombreFig = recolectables.texture.key;
+    //const puntoFig = this.shapes[nombreFig].point;
+    this.score += recolectables.getData("points");
+    this.shapes[nombreFig].count += 1;
     console.table(this.shapes);
     console.log("score", this.score);
+    console.log("recolectado");
     recolectables.destroy();
 
     this.scoreText.setText(
       `puntaje: ${this.score} 
-       T: ${this.shapes["triangle"].count} 
-       S: ${this.shapes["square"].count}  
-       D: ${this.shapes["diamond"].count}`
-    )
-     
-    this.checkWin();
-  }
-
-
-  checkWin(){
+      / T: ${this.shapes["triangle"].count} 
+      / S: ${this.shapes["square"].count}  
+      / D: ${this.shapes["diamond"].count}`
+    );
     const cumplePuntos = this.score >= 100;
     const cumpleFiguras = 
     this.shapes["triangle"].count >= 2 &&
@@ -160,65 +147,60 @@
 
     if (cumplePuntos && cumpleFiguras) {
       console.log("Ganaste");
-      this.scene.start("end",{
-        score: this.score,
-        gameOver: this.gameOver,
-      })
-     }
+      this.scene.start("end",{score:this.score, gameOver: this.gameOver})
   }
-  
-
+}
   
   floor(platforms, recolectables){
     recolectables.disableBody(true,true)
     }
-  
     onSecond() {
-      //crear reecolectable
-      
+      //crear recolectable
   
       const tipos = ["triangle", "square", "diamond", "bomb"];
       const tipo = Phaser.Math.RND.pick(tipos);
   
       let recolectable = this.recolectables.create(
-        Phaser.Math.Between(10, 790),
-        0,
-        tipo
+          Phaser.Math.Between(10, 790),
+          0,
+          tipo
       );
+      if(tipo=="bomb"){
+        recolectable.setScale(0.1)
+      }
       recolectable.setVelocity(0, 100);
-  
+
+      this.physics.add.collider(recolectable, this.recolectables)
       const rebote = Phaser.Math.FloatBetween(0.4, 0.8);
       recolectable.setBounceY(rebote);
-      this.physics.add.collider(recolectable, this.recolectables)
-       //set data
-    recolectable.setData("points",this.shapes[tipo].points);
-    recolectable.setData("tipo",tipo);
-    }
-    onRecolectableBounced(recolectables, _plataformas){
-      let points = recolectables.getData("points");
-      points -= 5;
-      recolectables.setData("points", points);
-      if (points <= 0) {
-        recolectables.destroy();
-      }
-      console.log(this.onRecolectableBounced)
-     }
-  
-    handlerTimer() {
-      this.timer -= 1;
-      this.timerText.setText(`tiempo restante: ${this.timer}`);
-      if (this.timer === 0) {
-        this.gameOver = true;
-        this.gameOver = true;
-        this.scene.start("end",{
-          score: this.score,
-          gameOver: this.gameOver,
-        })
-      } 
-     
-    }
       
-    
+      // Configurar datos del recolectable
+      recolectable.setData("points", this.shapes[tipo].points);
+      recolectable.setData("tipo", tipo);
+      recolectable.setData("rebotes", 0); // Inicializar el contador de rebotes
+      recolectable.setData("maxRebotes", 5); // Establecer el máximo de rebotes permitidos
+  }
+  onRecolectableBounced(platforms, recolectable) {
+    console.log("recolectable rebote",recolectable);
+    let points = recolectable.getData("points");
+    points -= 5;
+    console.log(points)
+    recolectable.setData("points", points);
+    if (points <= 0) {
+      recolectable.destroy();
+    }
+  }
+  handlerTimer() {
+    this.timer -= 1;
+    this.timerText.setText(`tiempo restante: ${this.timer}`);
+    if (this.timer === 0) {
+        this.gameOver = true;
+        this.scene.start("end", {
+            score: this.score,
+            gameOver: this.gameOver,
+        });
+    }
+}  
     update() {
       if (this.cursor.left.isDown) {
         this.personaje.setVelocityX(-160)
@@ -231,17 +213,12 @@
       }
       if( this.r.isDown){
         console.log("reincia")
-        this.scene.restart(`GAME`);
-        
+        this.scene.restart(GAME);  
       }
       if(this.gameOver){
           this.physics.pause();
           this.timerText.setText("Game Over");
           return;
       }
-      
     }  
-    
   }
-    
-   
