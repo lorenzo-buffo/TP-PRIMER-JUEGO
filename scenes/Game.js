@@ -49,7 +49,8 @@ create() {
     //al grupo de plataformas agregar plataforma
     this.platforms.create(400, 565, "platform").setScale(2).refreshBody();
   
-    this.platforms.create(400, 400, "platform")
+    this.platforms.create(700, 400, "platform")
+    this.platforms.create(100, 300, "platform")
   
     //Crear pj
     this.personaje = this.physics.add.sprite(400, 300, "personaje")
